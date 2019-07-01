@@ -1,21 +1,21 @@
 {
-	"name": "gateway",
-	"version": "0.0.4",
+	"name": "subscriptions",
+	"version": "0.0.1",
 	"deprecated": false,
-	"description": "Senti Gateway service",
+	"description": "Senti subscriptions service",
 	"main": "server.js",
 	"scripts": {},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/senti-iot/senti-gateway.git"
+		"url": "git+https://github.com/senti-iot/senti-subscriptions.git"
 	},
 	"keywords": [
 		"Senti.Cloud",
 		"Senti.IoT",
 		"Senti",
 		"IoT",
-		"Gateway",
-		"Micro Service Gateway",
+		"subscriptions",
+		"Micro Service subscriptions",
 		"NodeJS",
 		"Express",
 		"Micro Service"
@@ -27,9 +27,9 @@
 	},
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/senti-iot/senti-gateway/issues"
+		"url": "https://github.com/senti-iot/senti-subscriptions/issues"
 	},
-	"homepage": "https://github.com/senti-iot/senti-gateway#readme",
+	"homepage": "https://github.com/senti-iot/senti-subscriptions#readme",
 	"dependencies": {
 		"apisauce": "^1.0.2",
 		"cors": "^2.8.5",
