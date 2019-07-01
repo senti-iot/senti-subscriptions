@@ -1,6 +1,6 @@
 {
 	"name": "subscriptions",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"deprecated": false,
 	"description": "Senti subscriptions service",
 	"main": "server.js",
