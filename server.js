@@ -36,7 +36,7 @@ startServer()
 
 //#region Subscriptions/CRON
 
-const createAPI = require('apisauce').create
+//const createAPI = require('apisauce').create
 const sentiSubscription = require('./lib/sentiSubscription')
 const CronJob = require('cron').CronJob
 
