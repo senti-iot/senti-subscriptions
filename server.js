@@ -64,6 +64,9 @@ datafranetatmo = {
         mqttPub: 'v1/webhouse/location/europe/registries/demo-registry/devices/netatmo---stine-4adee4f1/publish'
     }
 }
+let mySentiSubscription = new sentiSubscription()
+mySentiSubscription.init(datafranetatmo, console.log)
+mySentiSubscription.execute()
 
 const job = new CronJob('*/10 * * * *', function() {
     const d = new Date();
