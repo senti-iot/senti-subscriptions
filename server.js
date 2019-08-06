@@ -37,45 +37,35 @@ startServer()
 //#region Subscriptions/CRON
 
 //const createAPI = require('apisauce').create
+var mysqlConn = require('./mysql/mysql_handler')
 const sentiSubscription = require('./lib/sentiSubscription')
 const CronJob = require('cron').CronJob
 
-// DEMO DATA 
-datafranetatmo = {
-    baseURL: 'https://api.netatmo.com',
-    authType: 2,
-    authAux: {
-        url: '/oauth2/token',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        params: 'grant_type=password&username=cb%40senti.io&password=Fejl40fugl&scope=read_station&client_id=5cefcea6e9532369ed521b89&client_secret=YuOFRtpwJJFgV5elWP03G2EGWmo',
-        accessTokenProp: 'access_token'
-    },
-    url: '/api/getstationsdata',
-    params: {
-        device_id: "70:ee:50:14:5d:d2"
-    },
-    headers: {},
-    cloudFunctions: [24],
-     device: {
-        id: '567',
-        company: 'webhouse',
-        location: 'europa',
-        registry: 'demo-registry',
-        mqttPub: 'v1/webhouse/location/europe/registries/demo-registry/devices/netatmo---stine-4adee4f1/publish'
+var subScriptions = {}
+
+let query = `SELECT s.id, s.data, r.device_id, r.data as config 
+                FROM Device_subscription s
+                    INNER JOIN Device_data_request r ON r.id = s.device_data_request_id
+                WHERE s.active = 1`
+mysqlConn.query(query, []).then(rs => {
+    if(rs[0].length > 0) {
+        rs[0].forEach(r => {
+            subScriptions[r.id] = new CronJob(r.data.cron, function() {
+                const d = new Date();
+                console.log(d);
+            	let mySentiSubscription = new sentiSubscription()
+                mySentiSubscription.init(r.config, console.log)
+                mySentiSubscription.execute()
+            });
+            subScriptions[r.id].start()
+
+            let mySentiSubscription = new sentiSubscription()
+            mySentiSubscription.init(r.config, console.log)
+            mySentiSubscription.execute()
+        })
+        console.log(subScriptions)
     }
-}
-/* let mySentiSubscription = new sentiSubscription()
-mySentiSubscription.init(datafranetatmo, console.log)
-mySentiSubscription.execute()
- */
-const job = new CronJob('*/10 * * * *', function() {
-    const d = new Date();
-	console.log(d);
-	let mySentiSubscription = new sentiSubscription()
-    mySentiSubscription.init(datafranetatmo, console.log)
-    mySentiSubscription.execute()
-});
-job.start();
-
-
+}).catch(err => {
+    console.log(err)
+})
 //#endregion
