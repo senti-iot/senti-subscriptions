@@ -7,6 +7,16 @@ const app = express()
 
 // API endpoint imports
 
+//#region sentiSubscriptionCron/CRON init
+const sentiSubscriptionCron = require('./lib/sentiSubscriptionCron')
+const sentiCron = new sentiSubscriptionCron()
+module.exports.sentiCron = sentiCron
+//#endregion
+
+//#region Data subscriptions
+const getDatasubscriptions = require('./api/data-subscription/getDatasubscriptions')
+//#endregion
+
 const port = process.env.NODE_PORT || 3013
 
 app.use(helmet())
@@ -15,14 +25,14 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use(cors())
 
-
+app.use([getDatasubscriptions])
 
 
 //---Start the express server---------------------------------------------------
 
 const startServer = () => {
 	app.listen(port, () => {
-		console.log('Senti Service started on port', port)
+        console.log('Senti Service started on port', port)
 	}).on('error', (err) => {
 		if (err.errno === 'EADDRINUSE') {
 			console.log('Service not started, port ' + port + ' is busy')
@@ -36,8 +46,11 @@ startServer()
 
 //#region Subscriptions/CRON
 
+sentiCron.init()
+//sentiCron.subscriptions[1] = 123
+
 //const createAPI = require('apisauce').create
-var mysqlConn = require('./mysql/mysql_handler')
+/* var mysqlConn = require('./mysql/mysql_handler')
 const sentiSubscription = require('./lib/sentiSubscription')
 const CronJob = require('cron').CronJob
 
@@ -67,5 +80,5 @@ mysqlConn.query(query, []).then(rs => {
     }
 }).catch(err => {
     console.log(err)
-})
+}) */
 //#endregion
