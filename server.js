@@ -63,7 +63,7 @@ mysqlConn.query(query, []).then(rs => {
             mySentiSubscription.init(r.config, console.log)
             mySentiSubscription.execute()
         })
-        console.log(subScriptions)
+        // console.log(subScriptions)
     }
 }).catch(err => {
     console.log(err)
