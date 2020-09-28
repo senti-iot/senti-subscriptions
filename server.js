@@ -43,9 +43,9 @@ const CronJob = require('cron').CronJob
 
 var subScriptions = {}
 
-let query = `SELECT s.id, s.data, r.device_id, r.data as config 
-                FROM Device_subscription s
-                    INNER JOIN Device_data_request r ON r.id = s.device_data_request_id
+let query = `SELECT s.id, s.data, r.deviceId, r.data as config 
+                FROM deviceSubscription s
+                    INNER JOIN deviceDataRequest r ON r.id = deviceDataRequestId
                 WHERE s.active = 1`
 mysqlConn.query(query, []).then(rs => {
     if(rs[0].length > 0) {
@@ -63,7 +63,7 @@ mysqlConn.query(query, []).then(rs => {
             mySentiSubscription.init(r.config, console.log)
             mySentiSubscription.execute()
         })
-        // console.log(subScriptions)
+        console.log(subScriptions)
     }
 }).catch(err => {
     console.log(err)
