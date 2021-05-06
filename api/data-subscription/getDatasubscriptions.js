@@ -10,7 +10,7 @@ router.get('/subs', async (req, res, next) => {
     res.status(200).json(await subscriptionService.getSubscriptions())
 })
 router.get('/subs/reload', async (req, res, next) => {
-    res.status(200).json(cron.reload())
+    res.status(200).json(await cron.reload())
 })
 router.get('/sub/:uuid', async (req, res, next) => {
     res.status(200).json(await subscriptionService.getSubscriptionByUuid(req.params.uuid))
