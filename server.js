@@ -1,22 +1,41 @@
 #!/usr/bin/env nodejs
+process.title = "iotrace-gateway"
 const dotenv = require('dotenv').config()
+if (dotenv.error) {
+	console.warn(dotenv.error)
+}
 const express = require('express')
 const cors = require('cors')
 const helmet = require('helmet')
 const app = express()
 
-// API endpoint imports
+// ACL Client
+const sentiAuthClient = require('senti-apicore').sentiAuthClient
+const authClient = new sentiAuthClient(process.env.AUTHCLIENTURL, process.env.PASSWORDSALT)
+module.exports.authClient = authClient
+
+const sentiAclBackend = require('senti-apicore').sentiAclBackend
+const sentiAclClient = require('senti-apicore').sentiAclClient
+
+const aclBackend = new sentiAclBackend(process.env.ACLBACKENDTURL)
+const aclClient = new sentiAclClient(aclBackend)
+module.exports.aclClient = aclClient
+
+//#region mqtt handler
+const sentiMqttHandler = require('senti-apicore').secureMqttHandler
+const sentiMqttClient = new sentiMqttHandler(process.env.MQTT_HOST, process.env.MQTT_USER, process.env.MQTT_PASS, 'sentiHandler')
+sentiMqttClient.connect()
+module.exports.sentiMqttClient = sentiMqttClient
+//#endregion
 
 //#region sentiSubscriptionCron/CRON init
 const sentiSubscriptionCron = require('./lib/sentiSubscriptionCron')
 const sentiCron = new sentiSubscriptionCron()
 module.exports.sentiCron = sentiCron
+sentiCron.init()
 //#endregion
 
-//#region Data subscriptions
-const getDatasubscriptions = require('./api/data-subscription/getDatasubscriptions')
-//#endregion
-
+// API Request Parsers
 const port = process.env.NODE_PORT || 3013
 
 app.use(helmet())
@@ -25,14 +44,23 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use(cors())
 
+// API endpoint imports
+const auth = require('./api/auth/auth')
+app.use([auth])
+
+const getDatasubscriptions = require('./api/data-subscription/getDatasubscriptions')
 app.use([getDatasubscriptions])
 
 
 //---Start the express server---------------------------------------------------
 
+var printRoutes = require('./lib/printRoutes')
+
 const startServer = () => {
+	console.clear()
+	printRoutes(app)
 	app.listen(port, () => {
-        console.log('Senti Service started on port', port)
+		console.log('Senti Service started on port', port)
 	}).on('error', (err) => {
 		if (err.errno === 'EADDRINUSE') {
 			console.log('Service not started, port ' + port + ' is busy')
@@ -43,42 +71,3 @@ const startServer = () => {
 }
 
 startServer()
-
-//#region Subscriptions/CRON
-
-sentiCron.init()
-//sentiCron.subscriptions[1] = 123
-
-//const createAPI = require('apisauce').create
-/* var mysqlConn = require('./mysql/mysql_handler')
-const sentiSubscription = require('./lib/sentiSubscription')
-const CronJob = require('cron').CronJob
-
-var subScriptions = {}
-
-let query = `SELECT s.id, s.data, r.device_id, r.data as config 
-                FROM Device_subscription s
-                    INNER JOIN Device_data_request r ON r.id = s.device_data_request_id
-                WHERE s.active = 1`
-mysqlConn.query(query, []).then(rs => {
-    if(rs[0].length > 0) {
-        rs[0].forEach(r => {
-            subScriptions[r.id] = new CronJob(r.data.cron, function() {
-                const d = new Date();
-                console.log(d);
-            	let mySentiSubscription = new sentiSubscription()
-                mySentiSubscription.init(r.config, console.log)
-                mySentiSubscription.execute()
-            });
-            subScriptions[r.id].start()
-
-            let mySentiSubscription = new sentiSubscription()
-            mySentiSubscription.init(r.config, console.log)
-            mySentiSubscription.execute()
-        })
-        console.log(subScriptions)
-    }
-}).catch(err => {
-    console.log(err)
-}) */
-//#endregion

@@ -1,49 +1,37 @@
 const express = require('express')
 const router = express.Router()
-const verifyAPIVersion = require('senti-apicore').verifyapiversion
-const { authenticate } = require('senti-apicore')
-var mysqlConn = require('../../mysql/mysql_handler')
+
+const sentiSubscriptionService = require('../../lib/sentiSubscriptionsService')
+const subscriptionService = new sentiSubscriptionService()
 
 const cron = require('../../server').sentiCron
 
-router.get('/mb/:id/', async (req, res, next) => {
-    console.log('Mikkel', cron.subscriptions)
-
-/*     let query = `SELECT s.id, s.data, r.device_id, r.data as config 
-        FROM Device_subscription s
-            INNER JOIN Device_data_request r ON r.id = s.device_data_request_id
-        WHERE s.active = 1`
-    mysqlConn.query(query, []).then(rs => {
-        if(rs[0].length > 0) {
-            res.status(200).json(rs[0])
-        }
-    }).catch(err => {
-        console.log(err)
-    })
- */
-     let result = {
-        "query": req.query,
-        "params": req.params,
-        "cron": cron.subscriptions['id'+req.params.id].cronTime
-    }
-    res.status(200).json([result])
-})
-
 router.get('/subs', async (req, res, next) => {
-    console.log('subs', cron.subscriptions)
-
-    res.status(200).json('Hej')
+    res.status(200).json(await subscriptionService.getSubscriptions())
 })
-
-
-router.get('/sub/:id/start', async (req, res, next) => {
-    res.status(200).json(cron.start(req.params.id))
+router.get('/sub/:uuid', async (req, res, next) => {
+    res.status(200).json(await subscriptionService.getSubscriptionByUuid(req.params.uuid))
 })
-router.get('/sub/:id/stop', async (req, res, next) => {
-    res.status(200).json(cron.stop(req.params.id))
+router.post('/sub/:uuid', async (req, res, next) => {
+    res.status(200).json()
 })
-router.get('/sub/:id/status', async (req, res, next) => {
-    res.status(200).json(cron.status(req.params.id))
+router.put('/sub/:uuid', async (req, res, next) => {
+    // let subscription = await subscriptionService.getSubscriptionByUuid(req.params.uuid)
+    // cron.stop(subscription.id)
+    res.status(200).json()
+})
+router.get('/sub/:uuid/start', async (req, res, next) => {
+    res.status(200).json(cron.start(await subscriptionService.getIdByUuid(req.params.uuid)))
+})
+router.get('/sub/:uuid/stop', async (req, res, next) => {
+    res.status(200).json(cron.stop(await subscriptionService.getIdByUuid(req.params.uuid)))
+})
+router.get('/sub/:uuid/status', async (req, res, next) => {
+    console.log(subscriptionService.getIdByUuid(req.params.uuid))
+    res.status(200).json(cron.status(await subscriptionService.getIdByUuid(req.params.uuid)))
+})
+router.get('/sub/:uuid/run', async (req, res, next) => {
+    res.status(200).json(cron.run(await subscriptionService.getSubscriptionByUuid(req.params.uuid)))
 })
 
 module.exports = router
