@@ -30,7 +30,6 @@ router.get('/sub/:uuid/stop', async (req, res, next) => {
     res.status(200).json(cron.stop(await subscriptionService.getIdByUuid(req.params.uuid)))
 })
 router.get('/sub/:uuid/status', async (req, res, next) => {
-    console.log(subscriptionService.getIdByUuid(req.params.uuid))
     res.status(200).json(cron.status(await subscriptionService.getIdByUuid(req.params.uuid)))
 })
 router.get('/sub/:uuid/run', async (req, res, next) => {
