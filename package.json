@@ -5,7 +5,7 @@
 	"description": "Senti subscriptions service",
 	"main": "server.js",
 	"scripts": {
-		"test": "echo \"npm test temporarily disabled\""
+		"test": "echo 'No Tests'"
 	},
 	"repository": {
 		"type": "git",
@@ -33,7 +33,8 @@
 	},
 	"homepage": "https://github.com/senti-iot/senti-subscriptions#readme",
 	"dependencies": {
-		"apisauce": "^2.0.1",
+		"apisauce": "^2.1.1",
+		"cli-table3": "^0.6.0",
 		"cors": "^2.8.5",
 		"cron": "^1.7.1",
 		"dotenv": "^6.2.0",
@@ -46,6 +47,6 @@
 		"mysql": "^2.17.1",
 		"mysql2": "^1.6.5",
 		"pino": "^5.12.2",
-		"senti-apicore": "0.0.54"
+		"senti-apicore": "0.0.55"
 	}
 }
